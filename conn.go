@@ -8,13 +8,13 @@ import (
 	ldap "github.com/go-ldap/ldap/v3"
 )
 
-//Conn represents an Active Directory connection.
+// Conn represents an Active Directory connection.
 type Conn struct {
 	Conn   *ldap.Conn
 	Config *Config
 }
 
-//Connect returns an open connection to an Active Directory server or an error if one occurred.
+// Connect returns an open connection to an Active Directory server or an error if one occurred.
 func (c *Config) Connect() (*Conn, error) {
 	switch c.Security {
 	case SecurityNone:
@@ -34,7 +34,7 @@ func (c *Config) Connect() (*Conn, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Connection error: %w", err)
 		}
-		err = conn.StartTLS(&tls.Config{ServerName: c.Server, RootCAs: c.RootCAs})
+		err = conn.StartTLS(&tls.Config{ServerName: c.Server, InsecureSkipVerify: true, RootCAs: c.RootCAs})
 		if err != nil {
 			return nil, fmt.Errorf("Connection error: %w", err)
 		}
@@ -60,8 +60,8 @@ func (c *Config) Connect() (*Conn, error) {
 	}
 }
 
-//Bind authenticates the connection with the given userPrincipalName and password
-//and returns the result or an error if one occurred.
+// Bind authenticates the connection with the given userPrincipalName and password
+// and returns the result or an error if one occurred.
 func (c *Conn) Bind(upn, password string) (bool, error) {
 	if password == "" {
 		return false, nil
